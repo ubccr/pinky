@@ -1,0 +1,9 @@
+==============================================================================
+pinky - AUTHORS
+==============================================================================
+
+SMILES parsing code is a fork of frowns originally written by Brian Kelley.
+frowns was loosely based on the PyDaylight API written by Andrew Dalke. 
+
+The code for pinky is currently maintained by:
+      Andrew E. Bruno <aebruno2@buffalo.edu>

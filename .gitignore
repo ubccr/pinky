@@ -1,0 +1,9 @@
+*.py[cod]
+*.egg-info
+__pycache__
+MANIFEST
+dist/
+build/
+
+# Sphinx documentation
+docs/_build/
