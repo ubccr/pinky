@@ -3,7 +3,7 @@ from nose.tools import *
 from pinky.smiles import smilin
 from pinky.fingerprints import ecfp
 
-class SmilesTestCase(TestCase):
+class ECFPTestCase(TestCase):
     def test_ecfp(self):
         """Test Butyramide (example used in ECFP paper)"""
         mol = smilin('CCCC(=O)N')
