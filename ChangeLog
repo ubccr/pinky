@@ -1,6 +1,11 @@
 ChangeLog
 =========
 
+v0.0.2
+----------------------
+
+- Add required bitarray package to setup.py
+
 v0.0.1
 ----------------------
 
