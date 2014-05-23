@@ -16,7 +16,7 @@ def invariants(mol):
     for a in mol.atoms:
         components = []
         components.append(a.number)
-        components.append(len(a.bonds))
+        components.append(len(a.oatoms))
         components.append(a.hcount)
         components.append(a.charge)
         components.append(a.mass)
