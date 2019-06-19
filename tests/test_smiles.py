@@ -12,15 +12,15 @@ class SmilesTestCase(TestCase):
         smiles_strings = []
         with open("{}/smiles.txt".format(self.path), 'rb') as fh:
             for line in fh:
-                smiles_strings.append(line.strip())
+                smiles_strings.append(line.decode("utf-8").strip())
 
         for smile in smiles_strings:
             mol = smilin(smile)
             out = mol.arbsmiles()
             can = mol.cansmiles()
             for bond in mol.bonds:
-                print bond.symbol, bond.bondorder, bond.bondtype, bond.fixed
+                print(bond.symbol, bond.bondorder, bond.bondtype, bond.fixed)
             for atom in mol.atoms:
-                print atom, atom.sumBondOrders()
+                print(atom, atom.sumBondOrders())
                 
-            print smile, out, can
+            print(smile, out, can)

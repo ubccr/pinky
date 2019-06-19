@@ -1,6 +1,4 @@
-===============================================================================
-pinky - molecular fingerprint library
-===============================================================================
+# pinky - molecular fingerprint library
 
 pinky is library for generating molecular fingerprints from SMILES strings.
 
@@ -13,10 +11,9 @@ fingerprint algorithms (currently only ECFP is supported). Also, would like to
 battle test the SMILES parser to provide a robust pure python SMILES parsing
 library.
 
-------------------------------------------------------------------------
-Usage
-------------------------------------------------------------------------
+## Usage
 
+```python
 from pinky.smiles import smilin
 from pinky.fingerprints import ecfp
 
@@ -28,9 +25,8 @@ for bond in mol.bonds:
 
 # Compute ECFP_4 fingerprint
 fp = ecfp(mol, radius=2)
+```
 
-------------------------------------------------------------------------
-License
-------------------------------------------------------------------------
+## License
 
 See LICENSE file.

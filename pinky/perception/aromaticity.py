@@ -99,13 +99,13 @@ def canBeAromatic(cycle, pyroleLike):
     if cycleLength == 5:
         # check atom types
         for atom in cycle.atoms:
-            if not AROMATIC_PYROLE_ATOMS.has_key(atom.symbol):
+            if not atom.symbol in AROMATIC_PYROLE_ATOMS:
                 return NEVER
 
         # do we have exactly one pyrole nitrogen like atom?
         pyroleCount = 0
         for atom in cycle.atoms:
-            if pyroleLike.has_key(atom.handle):
+            if atom.handle in pyroleLike:
                 pyrole = atom
                 pyroleCount += 1
 
@@ -131,7 +131,7 @@ def canBeAromatic(cycle, pyroleLike):
         # XXX FIX ME -> there is a lot of problems with this
         # code I think, what about bonds that are already fixed?
         for atom in cycle.atoms:
-            if not AROMATIC_ATOMS.has_key(atom.symbol):
+            if not atom.symbol in AROMATIC_ATOMS:
                 return NEVER
             
         bonds = cycle.bonds[:]        
@@ -208,7 +208,7 @@ def convert(cycle, pyroleLike, usedPyroles):
             # there is one special case of a five membered
             #  ring and a pyrole nitrogen like atom we need
             #  to look for.
-            if len(cycle) == 5 and pyroleLike.has_key(atom.handle):
+            if len(cycle) == 5 and atom.handle in pyroleLike:
                 _usedPyroles[atom.handle] = 1
             else:
                 # nope, the valences don't work out so
@@ -251,7 +251,7 @@ def addHydrogens(molecule, usedPyroles=None):
                 if hcount >= 0:
                     break
             else:
-                if usedPyroles and not usedPyroles.has_key(atom.handle):
+                if usedPyroles and not atom.handle in usedPyroles:
                     #print atom.symbol, atom.valences, atom.hcount, atom.charge,\
                     #      atom.sumBondOrders()
                     #print [x.bondtype for x in atom.bonds]
@@ -296,16 +296,16 @@ def fixBonds(molecule, usedPyroles):
             for bond in cycle.bonds:
                 # check for bonds adjacent to pyrole like
                 # atoms
-                if bondsToBeFixed.has_key(bond.handle) and len(cycle) == 5:
+                if bond.handle in bondsToBeFixed and len(cycle) == 5:
                     for atom in bond.atoms:
-                        if atom in cycle.atoms and usedPyroles.has_key(atom.handle):
+                        if atom in cycle.atoms and atom.handle in usedPyroles:
                             bond.reset(bond.symbol, 1, 4, 1, bond.stereo)
                             del bondsToBeFixed[bond.handle]
                             break
                 cycleBonds[bond.handle] = bond
 
     for bond in bondsToBeFixed.values():
-        if not cycleBonds.has_key(bond.handle):
+        if not bond.handle in cycleBonds:
             if bond.bondtype == 4:
                 raise PinkyError("Aromatic Bond outside ring %s"% bond)
             else:
@@ -336,11 +336,11 @@ def fixBonds(molecule, usedPyroles):
         while changed:
             changed = 0
 
-            for bond in bondsToBeFixed.values():
+            for bond in list(bondsToBeFixed.values()):
                 for atom in bond.atoms:
                     for connectedBond in atom.bonds:
                         if connectedBond is not bond and \
-                               cycleBonds.has_key(connectedBond.handle) and \
+                               connectedBond.handle in cycleBonds and \
                                connectedBond.fixed:
                             if connectedBond.bondorder == 2:
                                 bondorder = 1
@@ -358,7 +358,7 @@ def fixBonds(molecule, usedPyroles):
 
         if not changed and bondsToBeFixed:
             # arbitrarily fix a bond to be a single bond
-            bond = bondsToBeFixed.values()[0]
+            bond = list(bondsToBeFixed.values())[0]
             bond.fixed = 1
             del bondsToBeFixed[bond.handle]
                         

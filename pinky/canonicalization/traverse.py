@@ -71,7 +71,7 @@ def _traverse(atom, traverse, prevAtom,
             # we are traversing back the way we came!
             # so don't...
             pass
-        elif visitedAtoms.has_key(oatom):
+        elif oatom in visitedAtoms:
             # a closure!
             traverse.addClosure(atom, oatom, bond)
             bonds.append(bond)
@@ -91,7 +91,7 @@ def _traverse(atom, traverse, prevAtom,
     bondsToTraverse.sort()
 
     for symorder, bondEclass, index, oatom, obond in bondsToTraverse:
-        if visitedAtoms.has_key(oatom):
+        if oatom in visitedAtoms:
             # somehow, we've seen this atom so skip it
             continue
         nextTraverse = Traversal(traverse)
@@ -145,7 +145,7 @@ def draw(molecule, TraversalType=SmilesTraversal):
                   atomsUsed, bondsUsed, TraversalType)
         atoms = []
         for atom in allAtoms:
-            if not visitedAtoms.has_key(atom):
+            if not atom in visitedAtoms:
                 atoms.append(atom)
         assert nextTraverse.atoms == atomsUsed
         assert nextTraverse.bonds == bondsUsed, "%s %s"%(

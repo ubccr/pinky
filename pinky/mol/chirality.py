@@ -128,8 +128,8 @@ if __name__ == "__main__":
 
     c0 = T([a,b,c,d], "@")
 
-    print c0.getChirality([a,b,c,d])
-    print c0.getChirality([a,b,d,c])
+    print(c0.getChirality([a,b,c,d]))
+    print(c0.getChirality([a,b,d,c]))
     
     
     

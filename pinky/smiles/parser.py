@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 import re
 import string
-import handler
+from pinky.smiles import handler
 from .builder import BuildMol
 from ..perception import aromaticity, figueras
 

@@ -45,7 +45,7 @@ def ecfp(mol, radius=2):
     atom_neighborhoods = [ len(mol.bonds) * bitarray('0') for a in mol.atoms]
     dead_atoms = len(mol.atoms) * bitarray('0')
 
-    for layer in xrange(1, radius+1):
+    for layer in range(1, radius+1):
         round_ids = {}
         round_atom_neighborhoods = copy.deepcopy(atom_neighborhoods)
         neighborhoods_this_round = []

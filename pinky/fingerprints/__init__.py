@@ -1,1 +1,1 @@
-from ecfp import ecfp
+from pinky.fingerprints.ecfp import ecfp

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from .atypes import defaultAtomTypes
 from .idgen import defaultGenerator
-import chirality
+from pinky.mol import chirality
 from ..exceptions import PinkyError
 
 #
@@ -161,3 +161,6 @@ class Atom(object):
         return "%s(%s)"%(self.__class__.__name__,
                          self.index)
 
+    def __lt__(self, other):
+        return ("%s(%s)"%(self.__class__.__name__, self.index) <
+               "%s(%s)"%(other.__class__.__name__, other.index))

@@ -116,7 +116,7 @@ class Atom:
         orderOfClosures = []
         closureMappings = self.closureMappings
         for id, bond in self.closures:
-            if not closureMappings.has_key(id):
+            if not id in closureMappings:
                 closureMappings[id] = idGenerator.next()
             id = closureMappings[id]
             orderOfClosures.append((id,bond))

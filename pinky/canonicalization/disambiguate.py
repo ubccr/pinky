@@ -55,7 +55,8 @@ JCICS
 They do not talk about canonicalizing using bond types or stereo
 chemistry though.  See notes below for details.
 """
-import primes
+from pinky.canonicalization import primes
+from itertools import zip_longest
 
 class FreedDisambiguate:
     def __init__(self, graph):
@@ -139,19 +140,21 @@ class FreedDisambiguate:
         """Use the connection to the atoms around a given vertex
         as a multiplication function to disambiguate a vertex"""
         offsets = self.offsets
+        symclasses = list(symclasses)
         result = symclasses[:]
-	for index in self.range:
-	    try:
-		val = 1
-		for offset, bondtype in offsets[index]:
-		    val *= symclasses[offset] * bondtype
-	    except OverflowError:
+        for index in self.range:
+            try:
+                val = 1
+                for offset, bondtype in offsets[index]:
+                    val *= symclasses[offset] * bondtype
+            except OverflowError:
                 # Hmm, how often does this occur?
-		val = 1L
-		for offset, bondtype in offsets[index]:
-		    val *= symclasses[offset] * bondtype
+                val = long(1)
+                for offset, bondtype in offsets[index]:
+                    val *= symclasses[offset] * bondtype
+
             result[index] = val
-	return result
+        return result
 
     def rank(self):
         """convert a list of integers so that the lowest integer
@@ -159,8 +162,7 @@ class FreedDisambiguate:
         note: modifies list in place"""
         # XXX FIX ME, should the lowest value be 1 or 0?
         symclasses = self.symclasses
-        stableSort = map(None, symclasses, range(len(symclasses)))
-        stableSort.sort()
+        stableSort = sorted(zip_longest(symclasses, range(len(symclasses))))
 
         last = None
         x = -1
@@ -180,10 +182,10 @@ class FreedDisambiguate:
         res = [ 4, 0, 3, 1, 2]
                 *     *        This tie is broken in this case
         """
-        stableSort = map(None, oldsym, newsym, range(len(oldsym)))
-        stableSort.sort()
+        stableSort = sorted(zip_longest(oldsym, newsym, range(len(oldsym))))
 
-        lastOld, lastNew = None, None
+        lastOld = None
+        lastNew = None
         x = -1
         for old, new, index in stableSort:
             if old != lastOld:
@@ -201,11 +203,10 @@ class FreedDisambiguate:
         """Find the position of the first lowest tie in a
         symorder or -1 if there are no ties"""
         _range = range(len(symorders))
-        stableSymorders = map(None, symorders, _range)
-
         # XXX FIX ME
         # Do I need to sort?
-        stableSymorders.sort()
+        stableSymorders = sorted(zip_longest(symorders, _range))
+
         lowest = None
         for index in _range:
             if stableSymorders[index][0] == lowest:

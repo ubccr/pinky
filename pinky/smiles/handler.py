@@ -30,7 +30,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-import UserList, sys
+import sys
+from collections import UserList
 
 class TokenHandler:
     def begin(self):
@@ -41,7 +42,7 @@ class TokenHandler:
         pass
     def error(self, errmsg, pos, text):
         """Called when an parse error occurs; error position, unparsed text"""
-        raise "%s at position %d: %s" % (errmsg, pos, repr(text))
+        raise ValueError("{} at position {}: {}".format(errmsg, pos, repr(text)))
     def end(self):
         pass
 
@@ -51,7 +52,7 @@ class WriteHandler(TokenHandler):
     def add_token(self, name, pos, text):
         self.outfile.write(" %d --> %s %s\n" % (pos, name, text))
 
-class SaveTokens(TokenHandler, UserList.UserList):
+class SaveTokens(TokenHandler, UserList):
     def begin(self):
         self.data[:] = []
     def add_token(self, name, pos, text):

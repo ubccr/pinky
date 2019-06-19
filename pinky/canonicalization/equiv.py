@@ -44,7 +44,7 @@ def compute_equiv_class(atom):
                       100000*(atom.hcount) + \
                       1000000*(atom.weight)
     except TypeError:
-        raise ValueError, \
+        raise(ValueError, \
               "Can't compute number from atom.number %s atom.charge %s atom.hcount %s"\
-              " atom.weight %s"%(atom.number, atom.charge, atom.hcount, atom.weight)
+              " atom.weight %s"%(atom.number, atom.charge, atom.hcount, atom.weight))
     return equiv_class

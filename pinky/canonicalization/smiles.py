@@ -49,7 +49,7 @@ information about closures.  This information is built up during the
 depth first search of the graph.
 """
 
-import tokens
+from pinky.canonicalization import tokens
 
 class IDGenerator:
     def __init__(self):

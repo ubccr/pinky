@@ -76,7 +76,7 @@ class Molecule(object):
                             
     def add_atom(self, atom):
         if atom.parent:
-            raise "Already have atom", atom
+            raise("Already have atom", atom)
 
         # set the parent of the atom to be this object
         # set up all the relevant datastructures for
@@ -93,11 +93,11 @@ class Molecule(object):
 
     def add_bond(self, bond, atom1, atom2):
         if atom1.parent is not self:
-            raise "Atom", atom1, "is not in the molecule"
+            raise("Atom", atom1, "is not in the molecule")
         if atom2.parent is not self:
-              raise "Atom", atom2, "is not in the molecule"          
+              raise("Atom", atom2, "is not in the molecule")          
         if bond.parent:
-            raise "Bond", bond, "already has a parent"
+            raise("Bond", bond, "already has a parent")
         
         bond.parent = self
         bond.index = len(self.bonds)        

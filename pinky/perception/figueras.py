@@ -51,6 +51,7 @@ This is also the ring detection code that CDK uses for their ring
 perception so that might be a branch to investigate.
 """
 from .cycle import Cycle
+from itertools import zip_longest
 #from CheckFiguerasRings import checkRings
 
 def sssr(molecule):
@@ -66,8 +67,8 @@ def sssr(molecule):
 
     for atom in molecule.atoms:
         atom.rings = []
-	fullSet[atom.handle] = 1
-	lookup[atom.handle] = atom
+        fullSet[atom.handle] = 1
+        lookup[atom.handle] = atom
         oatoms[atom.handle] = atom.oatoms[:]
 
     for bond in molecule.bonds:
@@ -76,76 +77,78 @@ def sssr(molecule):
     trimSet = []
 
     while fullSet:
-	nodesN2 = []
+        nodesN2 = []
         minimum, minimum_degree = None, 100000
 
 
-	# find the N2 atoms and remove atoms with degree 0
-	for atomID in fullSet.keys():
-	    atom = lookup[atomID]
-	    degree = len(oatoms[atom.handle])
-	    if degree == 0:
-		del fullSet[atomID]
-		#fullSet.remove(atomID)
-	    elif degree == 2:
-		nodesN2.append(atom)
+        # find the N2 atoms and remove atoms with degree 0
+        for atomID in list(fullSet):
+            atom = lookup[atomID]
+            degree = len(oatoms[atom.handle])
+            if degree == 0:
+                del fullSet[atomID]
+                #fullSet.remove(atomID)
+            elif degree == 2:
+                nodesN2.append(atom)
 
-	    # keep track of the minimum degree
-	    if (degree > 0) and ( (not minimum) or 
-		                (degree < minimum_degree)):
-		minimum, minimum_degree = atom, degree
+            # keep track of the minimum degree
+            if (degree > 0) and ( (not minimum) or 
+                                (degree < minimum_degree)):
+                minimum, minimum_degree = atom, degree
 
-	if not minimum:
-	    # nothing to do!  (i.e. can't have a ring)
-	    break
+        if not minimum:
+            # nothing to do!  (i.e. can't have a ring)
+            break
 
-	if minimum_degree == 1:
-	    # these cannot be in rings so trim and remove
-	    # my version of trimming
+        if minimum_degree == 1:
+            # these cannot be in rings so trim and remove
+            # my version of trimming
             for oatom in oatoms[minimum.handle]:
-		oatoms[oatom.handle].remove(minimum)
+                oatoms[oatom.handle].remove(minimum)
             oatoms[minimum.handle] = []
-	    del fullSet[minimum.handle]
+            del fullSet[minimum.handle]
 
-	elif minimum_degree == 2:
-	    # find the rings!
-	    startNodes = []
-	    for atom in nodesN2:
-		ring, bonds = getRing(atom, fullSet, lookup, oatoms)
+        elif minimum_degree == 2:
+            # find the rings!
+            startNodes = []
+            for atom in nodesN2:
+                ring, bonds = getRing(atom, fullSet, lookup, oatoms)
+                ring = list(ring)
 
-		if ring:
+                if ring:
                     rlookup = ring[:]
                     rlookup.sort()
                     rlookup = tuple(rlookup)
-		    if (not results.has_key(rlookup)):# not in results):
-			results[rlookup] = ring, bonds
-			startNodes.append(atom)
+                    if (not rlookup in results):# not in results):
+                        results[rlookup] = ring, bonds
+                        startNodes.append(atom)
 
-	    # in case we didn't get a ring remove the head of the nodesN2
-	    startNodes = startNodes or [nodesN2[0]]
-	    for atom in startNodes:
-		# again, my version of trimming
+            # in case we didn't get a ring remove the head of the nodesN2
+            startNodes = startNodes or [nodesN2[0]]
+            for atom in startNodes:
+                # again, my version of trimming
                 if oatoms[atom.handle]:
-		    oatom = oatoms[atom.handle].pop()
-		    oatoms[oatom.handle].remove(atom)
+                    oatom = oatoms[atom.handle].pop()
+                    oatoms[oatom.handle].remove(atom)
 
-	elif minimum_degree > 2:
-	    # no N2 nodes so remove the "optimum" edge to create
-	    # N2 nodes in the next go-around.
-	    ring, bonds = getRing(minimum, fullSet, lookup, oatoms)
+        elif minimum_degree > 2:
+            # no N2 nodes so remove the "optimum" edge to create
+            # N2 nodes in the next go-around.
+            ring, bonds = getRing(minimum, fullSet, lookup, oatoms)
+            ring = list(ring)
             if ring:
                 key = ring[:]
                 key.sort()
                 key = tuple(key)
-                if not results.has_key(key):
+                if not key in results:
                     results[key] = ring, bonds
                     atoms = map(lookup.get, ring)
                     atoms, bonds = toposort(atoms, bonds)
                     checkEdges(atoms, lookup, oatoms)
             else:
                 del fullSet[minimum.handle]
- 	else:
-	    raise ShouldntGetHereError
+        else:
+            raise ShouldntGetHereError
 
     # assign the ring index to the atom
     rings = []
@@ -153,12 +156,12 @@ def sssr(molecule):
 
     # transform the handles back to atoms
     for result, bonds in results.values():
-	ring = []
+        ring = []
         for atomID in result:
-	    atom = lookup[atomID]
+            atom = lookup[atomID]
             assert atom.handle == atomID
-	    ring.append(atom)
-	rings.append((ring, bonds))
+            ring.append(atom)
+        rings.append((ring, bonds))
         index = index + 1
 
     molecule.rings = rings
@@ -195,6 +198,7 @@ def toposort(initialAtoms, initialBonds):
     # would have deleted it from the hash anyway
     ahash = {}
     bhash = {}
+    initialAtoms = list(initialAtoms)
     for atom in initialAtoms[1:]:
         ahash[atom.handle] = 1
         
@@ -212,12 +216,12 @@ def toposort(initialAtoms, initialBonds):
             # in our list of atoms and bonds to use
             # ugg, nested if's...  There has to be a
             # better control structure
-            if ahash.has_key(atom.handle):
+            if atom.handle in ahash:
                 bond = next.findbond(atom)
                 assert bond
                 # but wait! the bond has to be in our
                 # list of bonds we can use!
-                if bhash.has_key(bond.handle):
+                if bond.handle in bhash:
                     a_append(atom)
                     b_append(bond)
                     del ahash[atom.handle]
@@ -244,55 +248,55 @@ def getRing(startAtom, atomSet, lookup, oatoms):
     path = {}
     bpaths = {}
     for atomID in atomSet.keys():
-	# initially the paths are empty
-	path[atomID] = None
+        # initially the paths are empty
+        path[atomID] = None
         bpaths[atomID] = []
     
     q = []
     handle = startAtom.handle
     for atom in oatoms[handle]:
-	q.append((atom, handle))
+        q.append((atom, handle))
         path[atom.handle] = {atom.handle:1, handle:1}
         bpaths[atom.handle] = [startAtom.findbond(atom)]
             
     qIndex = 0
     lenQ = len(q)
 
-    while qIndex < lenQ:	
-	current, sourceHandle = q[qIndex]
+    while qIndex < lenQ:
+        current, sourceHandle = q[qIndex]
         handle = current.handle
-	qIndex += 1
+        qIndex += 1
 
         for next in oatoms[handle]:
-	    m = next.handle
+            m = next.handle
 
-	    if m != sourceHandle:
-		if not atomSet.has_key(m):
-		    return (), ()
+            if m != sourceHandle:
+                if not m in atomSet:
+                    return (), ()
                 
-		if path.get(m, None):
-		    intersections = 0
-		    for atom in path[handle].keys():
-			if path[m].has_key(atom):
-			    intersections = intersections + 1
-			    sharedAtom = atom
+                if path.get(m, None):
+                    intersections = 0
+                    for atom in path[handle].keys():
+                        if atom in path[m]:
+                            intersections = intersections + 1
+                            sharedAtom = atom
 
-		    if intersections == 1:
-			del path[handle][sharedAtom]
-			path[handle].update(path[m])
-			result = path[handle].keys()
+                    if intersections == 1:
+                        del path[handle][sharedAtom]
+                        path[handle].update(path[m])
+                        result = path[handle].keys()
                         bond = next.findbond(current)
                         # assert bond not in bpaths[handle] and bond not in bpaths[m]
                         bonds = bpaths[handle] + bpaths[m] + [bond]
-			return result, bonds
-		else:
-		    path[m] = path[handle].copy()
-		    path[m][m] = 1
+                        return result, bonds
+                else:
+                    path[m] = path[handle].copy()
+                    path[m][m] = 1
                     bond = next.findbond(current)
                     # assert bond not in bpaths[m] and bond not in bpaths[handle]
                     bpaths[m] = bpaths[handle] + [next.findbond(current)]
-		    q.append((next, handle))
-		    lenQ = lenQ + 1
+                    q.append((next, handle))
+                    lenQ = lenQ + 1
 
     return (), ()
 
@@ -303,13 +307,13 @@ def checkEdges(ringSet, lookup, oatoms):
     break an optimal non N2 node and return the largest ring
     found
     """
-    bondedAtoms = map( None, ringSet[:-1], ringSet[1:] )
+    bondedAtoms = list(zip_longest(ringSet[:-1], ringSet[1:]))
     bondedAtoms += [ (ringSet[-1], ringSet[0]) ]
 
     # form a lookup for the ringSet list
     atomSet = {}
     for atomID in ringSet:
-	atomSet[atomID] = 1
+        atomSet[atomID] = 1
     results = []
     
     # for each bond in the ring, break it and find the smallest
@@ -327,18 +331,18 @@ def checkEdges(ringSet, lookup, oatoms):
 
         # break the bond
         del oatoms1[index1]
-	del oatoms2[index2]
+        del oatoms2[index2]
 
-	ring1 = getRing(atom1, atomSet, lookup, oatoms)
-	ring2 = getRing(atom2, atomSet, lookup, oatoms)
-	
-	# keep the larger of the two rings
-	if len(ring1) > len(ring2):
-	    results.append((len(ring1),
+        ring1 = getRing(atom1, atomSet, lookup, oatoms)
+        ring2 = getRing(atom2, atomSet, lookup, oatoms)
+        
+        # keep the larger of the two rings
+        if len(ring1) > len(ring2):
+            results.append((len(ring1),
                             handle1, handle2,
                             ring1))
-	else:
-    	    results.append((len(ring2),
+        else:
+            results.append((len(ring2),
                             handle2, handle1,
                             ring2))
 
@@ -348,7 +352,7 @@ def checkEdges(ringSet, lookup, oatoms):
 
 
     if not results:
-	return None
+        return None
 
     #  find the smallest ring
     size, incidentHandle, adjacentHandle, smallestRing = min(results)

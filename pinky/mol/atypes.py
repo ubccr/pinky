@@ -198,21 +198,21 @@ for element in (
   ("R", 0, "R Group", 0.0),
   ):
     if num in (1, 9, 17, 35, 53):
-	valences = valence_1
+        valences = valence_1
     elif num == 5:
-	valences = valence_B
+        valences = valence_B
     elif num == 6:
-	valences = valence_C
+        valences = valence_C
     elif num == 7:
-	valences = valence_N
+        valences = valence_N
     elif num == 8:
-	valences = valence_O
+        valences = valence_O
     elif num == 15:
-	valences = valence_P
+        valences = valence_P
     elif num == 16:
-	valences = valence_S
+        valences = valence_S
     else:
-	valences = valence_unknown
+        valences = valence_unknown
 
     # ok, we have the info, now create the class and
     #  add it to the table

@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # tokenizer.
 
 import string
-import handler
+from pinky.smiles import handler
 import weakref
 from ..mol import Atom, Bond, Molecule
 
@@ -55,7 +55,7 @@ BONDLOOKUP = {'-': ('-', 1, 1, 1, STEREO_NONE),
 
 def get_symbol_aromatic(text):
     if text[0] in "cnosp":
-        return string.upper(text), 1
+        return text.upper(), 1
     return text, 0
 
 def normalize_closure(text):
@@ -200,7 +200,7 @@ class BuildMol(handler.TokenHandler):
 
     def do_closure(self, text):
         num = normalize_closure(text)
-        if self.closures.has_key(num):
+        if num in self.closures:
             prev_atom, bond = self.closures[num]
             del self.closures[num]
 
